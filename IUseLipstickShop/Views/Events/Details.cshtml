@@ -1,0 +1,61 @@
+﻿@model Models.Framework.Product
+
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<head>
+    <link rel="stylesheet" type="text/css" href="~/Content/css/Chi-tiet-hang1.css">
+</head>
+@using (Html.BeginForm("AddCart", "Events"))
+{
+    <div class="body">
+        @Html.HiddenFor(model => model.Id)
+        <div class="img_hang1">
+            <img src="~/Content/img/@Html.DisplayFor(model => model.Images)" width="460" height="650" align="right">
+        </div>
+        <div class="thong_tin_mua">
+            <div class="name">
+                <p>@Html.DisplayFor(model => model.Name)-@Html.DisplayFor(model => model.Id)</p><br>
+                <p>STREET ONE</p><br>
+                <b><p>€@Html.DisplayFor(model => model.Price) <img src="~/Content/img/new.jpg" height="24"></p></b><br>
+                <p>VAT Included Shipping calculated at checkout.</p><br><br>
+            </div>
+            <form action="#" class="buy">
+                <div class="label_size">Size</div>
+                <div class="label_colour">Colour</div>
+                <div class="size">
+                    @Html.DropDownListFor(model => model.Size, null, new { @class = " option_colour" })
+                </div>
+                <div class="colour">
+                    @Html.DropDownListFor(model => model.Colour, null, new { @class = " option_colour" })
+                </div>
+                
+
+                @if (@User.Identity.Name != "")
+                {
+                    <button type="submit" class="button_add_to_cart">
+                        <span>ADD TO CART</span>
+                    </button>
+                }
+                else
+                {
+                    <a href="/UserLogin/Index" style="text-decoration: none;float:left;margin:5%;margin-left:20%">YOU HAVE TO LOIN BEFORE ADD TO CART</a>
+                }
+                <button class="button_buy_it_now" type="button">
+                    <span>BUY IT NOW</span>
+                </button>
+            </form>
+        </div>
+    </div>
+}
+
+
+    
+
+    <div class="back">
+        <a href="Trang-chu.html"><button class="button_back">BACK TO SPRING SUMMER COLLECTION 2021</button></a>
+    </div>
+    <!-- THIS THING -->
+
