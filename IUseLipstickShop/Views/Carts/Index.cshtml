@@ -24,9 +24,6 @@
                     <th style="width: 10%;height: 80px;">TOTAL</th>
                 </tr>
             </table>
-            @{ 
-                var CartUser = User.Identity.Name;
-            }
             @foreach (var item in Model)
             {
                 <table style="border-bottom: 1px solid black" class="san_pham">
@@ -39,20 +36,19 @@
                                 <br>
                                 Color: @item.Colour
                                 <br>
-                                <a style="margin-left: 15px; color: pink" href="/Carts" class="button_remove" data-id="@item.Prime">Remove</a>
+                                <a style="margin-left: 15px; color: pink" href="/Carts" class="button_remove" data-id="@item.Id" data-s="@item.Size" data-cl="@item.Colour">Remove</a>
                             </div>
                         </td>
 
                         <td class="PRICE">
                             <h4>€@item.Price</h4>
                         </td>
-
                         <td class="QUANTITY">
-                            <input class="change-price" data-id="@item.Prime" value="@item.Quanity" type="number" min="1">
+                            <input class="change-price" data-id="@item.Id" data-s="@item.Size" data-cl="@item.Colour" value="@item.Quanity" type="number" min="1" max="10">
                         </td>
 
                         <td class="TOTAL">
-                            €<h4 style="float:right" class="total-price-@item.Prime">@item.QuanityPice</h4>
+                            €<h4 style="float:right" class="total-price-@item.Id-@item.Colour-@item.Size">@item.QuanityPice</h4>
                         </td>
                     </tr>
                 </table>
@@ -76,7 +72,7 @@
                     </h4>
 
 
-                    <button style="background-color: #F5CFD1;height: 50px;width: 100px; margin-left: 60%; margin-top: 5%; border-radius: 5px;" data-id="@User.Identity.Name" class="checkout" type="submit">
+                    <button style="background-color: #F5CFD1;height: 50px;width: 100px; margin-left: 60%; margin-top: 5%; border-radius: 5px;" @*data-id="@User.Identity.Name"*@ class="checkout" type="submit">
                         CHECK OUT
                     </button>
                 </div>

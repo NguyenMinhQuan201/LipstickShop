@@ -52,16 +52,7 @@ namespace IUseLipstickShop.Controllers
             ViewBag.Colour = new SelectList(dao.ListAll(),"Id","colour1", selectedId);
             ViewBag.Size = new SelectList(dao.ListAllSize(), "Id", "C_size", selectedId);
         }
-        public async Task<ActionResult> AddCart(int id, int colour, int size)
-        {
-            var name = User.Identity.Name;
-            var result = new CartModels().AddCart(id, colour, size, name);
-            if (result == 0)
-            {
-                return HttpNotFound();
-            }
-            return RedirectToAction("Index", "Carts");
-        }
+        
         protected override void Dispose(bool disposing)
         {
             if (disposing)

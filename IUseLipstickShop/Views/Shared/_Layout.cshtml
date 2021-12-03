@@ -34,15 +34,13 @@
                 <script language="javascript" src="~/Content/js/Search.js"></script>
                 <!--  -->
 
-
+                <a href="/Carts/Index"><img src="~/Content/img/gio.jpg"></a>
                 @if (@User.Identity.Name == "")
                 {
-                    <a href="/UserLogin/Index"><img src="~/Content/img/gio.jpg"></a>
                     <a href="/UserLogin/Index"><img src="~/Content/img/nguoi.jpg"></a>
                 }
                 else
                 {
-                    <a href="/Carts/Index"><img src="~/Content/img/gio.jpg"></a>
                     <div style="margin-bottom:5px">
                         <span>Hello</span><a style="margin-left:5px">@User.Identity.Name</a><span style="margin-left:5px">@Html.ActionLink("Đăng Xuất", "Logout", "UserLogin")</span>
                     </div>

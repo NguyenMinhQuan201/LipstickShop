@@ -9,24 +9,89 @@ using System.Web;
 using System.Web.Mvc;
 using Models.Framework;
 using Models.User;
+using System.Web.Script.Serialization;
+using IUseLipstickShop.Common;
 
 namespace IUseLipstickShop.Controllers
 {
     public class CartsController : Controller
-    {
-        private const string CartSession = "CartSession";
+    {       
         private LipstickDbContext db = new LipstickDbContext();
 
         // GET: Carts
         public ActionResult Index()
         {
             var name = User.Identity.Name;
-            if (name == "")
+            /*if (name == "")
             {
-                return RedirectToAction("Index", "UserLogin");
-            }
+                return RedirectToAction("Index", "Carts");
+            
             var result = new CartModels().GetCart(name);
-            return View(result);
+        }*/
+            var cart = Session[CommonConstants.CartSession];
+            var list = new List<Cart>();
+            if (cart != null)
+            {
+                list = (List<Cart>)cart;
+            }
+            return View(list);
+        }
+        public async Task<ActionResult> AddCart(int id, int colour, int size)
+        {
+            var findS = db.Sizes.Where(x => x.Id == size).FirstOrDefault();
+            var findC = db.Colours.Where(x => x.Id == colour).FirstOrDefault();
+            var find = db.Products.Find(id);
+            var cart = Session[CommonConstants.CartSession];
+            if (cart != null)
+            {
+                var list = (List<Cart>)cart;
+                if (list.Exists(x => x.Id == id && x.Colour == findC.colour1 && x.Size == findS.C_size))
+                {
+                    foreach (var item in list)
+                    {
+                        if (item.Id == id && item.Colour == findC.colour1 && item.Size == findS.C_size)
+                        {
+                            item.Quanity += 1;
+                        }
+                    }
+                }
+                else
+                {
+                    var item = new Cart();
+                    item.Images = find.Images;
+                    item.Price = find.Price;
+                    item.QuanityPice = find.Price;
+                    item.Id = id;
+                    item.Quanity = 1;
+                    item.Colour = findC.colour1;
+                    item.Size = findS.C_size;
+                    list.Add(item);
+                }
+                Session[CommonConstants.CartSession] = list;
+            }
+            else
+            {
+                var item = new Cart();
+                item.Images = find.Images;
+                item.Price = find.Price;
+                item.QuanityPice = find.Price;
+                item.Id = id;
+                item.Quanity = 1;
+                item.Colour = findC.colour1;
+                item.Size = findS.C_size;
+                var list = new List<Cart>();
+                list.Add(item);
+                Session[CommonConstants.CartSession] = list;
+            }
+            return RedirectToAction("Index");
+            /*var cart = Session[CartSession];
+            var name = User.Identity.Name;
+            var result = new CartModels().AddCart(id, colour, size, name);
+            if (result == 0)
+            {
+                return HttpNotFound();
+            }
+            return RedirectToAction("Index", "Carts");*/
         }
         [HttpPost]
         
@@ -54,21 +119,51 @@ namespace IUseLipstickShop.Controllers
             await db.SaveChangesAsync();
             return RedirectToAction("Index");
         }
-        public JsonResult ChangePrice(int Prime, int Quanity)
+        public JsonResult ChangePrice(string cartModel)
         {
-            var result = new CartModels().ChangePrice(Prime, Quanity);
-            return Json(new { QuanityPice = result });
+            /* var result = new CartModels().ChangePrice(Prime, Quanity);
+             return Json(new { QuanityPice = result });*/
+            var jsoncart = new JavaScriptSerializer().Deserialize<List<Cart>>(cartModel);
+            var sessionCart = (List<Cart>)Session[CommonConstants.CartSession];
+            decimal total = 0;
+            foreach (var item in sessionCart)
+            {
+                var jsonitem = jsoncart.SingleOrDefault(x => x.Id == item.Id&&x.Colour==item.Colour&&x.Size==item.Size);
+                if (jsonitem != null)
+                {
+                    item.Quanity = jsonitem.Quanity;
+                    total = (decimal)item.Price;
+                    item.QuanityPice = jsonitem.Quanity*item.Price;
+                }
+            }
+            Session[CommonConstants.CartSession] = sessionCart;
+            
+            return Json(new{Price = total});
         }
         public JsonResult Checkout(string cartUser)
         {
-            var result = new CartModels().Checkout(cartUser);
+            /*var result = new CartModels().Checkout(cartUser);*/
+            var sessionCart = (List<Cart>)Session[CommonConstants.CartSession];
+            decimal result = 0;
+            foreach (var item in sessionCart)
+            {
+                result = result + (decimal)item.QuanityPice;
+            }
             return Json(new { totalCheck = result });
         }
 
-        public JsonResult Remove(int prime)
+        public JsonResult Remove(int id,string size, string colour)
         {
-            var result = new CartModels().Remove(prime);
-            return Json(new { status = result });
+            var sessionCart = (List<Cart>)Session[CommonConstants.CartSession];
+            /*var finds = db.Sizes.Where(x => x.Id==size).FirstOrDefault();
+            var findc = db.Colours.Where(x => x.Id==colour).FirstOrDefault();*/
+            sessionCart.RemoveAll(x => x.Id == id && x.Colour == colour && x.Size == size);
+            Session[CommonConstants.CartSession] = sessionCart;
+            return Json(
+                new { 
+                    status = true 
+                }
+            );
         }
         protected override void Dispose(bool disposing)
         {

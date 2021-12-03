@@ -7,17 +7,29 @@
         function callout() {
             if (window.jQuery) {
                 $('.change-price').on('change', function () {
-                    var input = $(this);
-                    var prime = input.data('id');
-                    var quanity = input.val();
+                    var listProduct = $('.change-price');
+                    var cartList = [];
+                    var click = $(this);
+                    Quanity= click.val(),
+                    Id = click.data('id'),
+                    Size = click.data('s'),
+                    Colour = click.data('cl'),
+                    $.each(listProduct, function (i, item) {
+                        cartList.push({
+                            Quanity: $(item).val(),
+                            Id: $(item).data('id'),
+                            Size: $(item).data('s'),
+                            Colour: $(item).data('cl'),
+                        });
+                    });
                     $.ajax({
                         url: "/Carts/ChangePrice",
-                        data: { prime: prime, quanity: quanity },
+                        data: { cartModel: JSON.stringify(cartList) },
                         dataType: "json",
                         type: "POST",
                         success: function (response) {
-                            if (response.QuanityPice > 0) {
-                                $(`.total-price-${prime}`).html(response.QuanityPice)
+                            if (response.Price>0) {
+                                $(`.total-price-${Id}-${Colour}-${Size}`).html(Quanity * response.Price)
                             }
                         }
                     })
@@ -26,27 +38,23 @@
 
                 $('.button_remove').off('click').on('click', function () {
                     var click = $(this);
-                    var prime = click.data('id');
-                    
-                    $.ajax({
-                        url: "/Carts/Remove",
-                        data: { prime: prime},
-                        dataType: "json",
-                        type: "DELETE",
-                        success: function (response) {
-                            if (response.status == true) {
-                                window.location.href = "/Carts";
-                            }
-                        }
-                    })
+                    Id = click.data('id'),
+                    Size = click.data('s'),
+                    Colour = click.data('cl'),
+                        $.ajax({
+                            url: "/Carts/Remove",
+                            data: { Id: Id, Size: Size, Colour: Colour },
+                            dataType: "json",
+                            type: "DELETE",
+                        })
                 });
                 $('.checkout').off('click').on('click', function () {
                     var click = $(this);
-                    var cartUser = click.data('id');
+                    /*var cartUser = click.data('id');*/
 
                     $.ajax({
                         url: "/Carts/Checkout",
-                        data: { cartUser: cartUser },
+                        /*data: { cartUser: cartUser },*/
                         dataType: "json",
                         type: "POST",
                         success: function (response) {
